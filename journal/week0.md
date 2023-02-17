@@ -6,7 +6,8 @@
 
 I installed the aws cli using gitpod, i downloaded my credential from aws and added them to gitpod.
 
-![gitpod aws cli](https://user-images.githubusercontent.com/101978292/219803411-ab5d685b-250f-4915-bff7-a877d0952011.jpg)
+![gitpod aws cli](https://user-images.githubusercontent.com/101978292/219803845-05311f37-1a82-4318-a33e-0a62b41a80b1.jpg)
+
 
 ### Created IAM User
 
