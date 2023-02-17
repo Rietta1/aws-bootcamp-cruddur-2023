@@ -6,6 +6,8 @@
 
 I installed the aws cli using gitpod, i downloaded my credential from aws and added them to gitpod.
 
+![gitpod aws cli](https://user-images.githubusercontent.com/101978292/219803411-ab5d685b-250f-4915-bff7-a877d0952011.jpg)
+
 ### Created IAM User
 
 i created IAM user and added authentication using Authy because i can use Authy on both mobile phones and desktop, i gave the user admin privellages by creating a user group and adding it.
