@@ -4,7 +4,69 @@
 
 ### Install and verify AWS CLI
 
-I installed the aws cli using gitpod, i downloaded my credential from aws and added them to gitpod.
+I installed the aws cli using gitpod using the [documentation](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html )
+
+
+```
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+
+unzip awscliv2.zip
+
+unzip -u awscliv2.zip
+
+sudo ./aws/install
+
+```
+
+
+
+Update our `.gitpod.yml` to include the following task.
+
+```sh
+tasks:
+  - name: aws-cli
+    env:
+      AWS_CLI_AUTO_PROMPT: on-partial
+    init: |
+      cd /workspace
+      curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      unzip awscliv2.zip
+      sudo ./aws/install
+      cd $THEIA_WORKSPACE_ROOT
+```
+i downloaded my credential from aws and added them to gitpod.
+We'll also run these commands indivually to perform the install manually
+
+### Create a new User and Generate AWS Credentials
+
+- Go to IAM  create a new user
+- `Enable console access` for the user
+- Create a new `Admin` Group and apply `AdministratorAccess`
+- Create the user and go find and click into the user
+- Click on `Security Credentials` and `Create Access Key`
+- Choose AWS CLI Access
+- Download the CSV with the credentials
+
+### Set Env Vars
+
+We will set these credentials for the current bash terminal
+```
+export AWS_ACCESS_KEY_ID=""
+export AWS_SECRET_ACCESS_KEY=""
+export AWS_DEFAULT_REGION=us-east-1
+```
+
+We'll tell Gitpod to remember these credentials if we relaunch our workspaces
+```
+gp env AWS_ACCESS_KEY_ID=""
+gp env AWS_SECRET_ACCESS_KEY=""
+gp env AWS_DEFAULT_REGION=us-east-1
+```
 
 ### Created IAM User
 
