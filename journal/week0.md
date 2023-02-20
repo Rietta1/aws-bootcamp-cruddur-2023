@@ -254,13 +254,14 @@ then go the health dashbord, click on the event log, click on the event bridge a
 
 ![health dashboard1](https://user-images.githubusercontent.com/101978292/220165859-b0e52c97-1012-401c-9830-1ab7039f9c84.jpg)
 
-![eventbridge health 3](https://user-images.githubusercontent.com/101978292/220165897-d5d568d4-b5b3-40d5-bdd3-a10c8e5f551b.jpg)
+![sns topic](https://user-images.githubusercontent.com/101978292/220169527-0c99b3e4-8dfa-44c5-93e6-5cf06bea301e.jpg)
+
 
 Now go back to sns and verify your email and setup
 
-![Screenshot 2023-02-20 174333](https://user-images.githubusercontent.com/101978292/220166865-663b172a-c7c2-43fe-9d9d-cdeb7513f8a4.jpg)
 
 -
+![Screenshot 2023-02-20 174333](https://user-images.githubusercontent.com/101978292/220170556-9b9c36e3-7099-40bf-abcc-f8608da42179.jpg)
 
 
 
