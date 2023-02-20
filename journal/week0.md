@@ -240,7 +240,7 @@ I set Set MFA, IAM role
 
 - I created the napkin drawing
 
-![image_67109633](https://user-images.githubusercontent.com/101978292/220162872-a9958ace-7e7f-4fbc-91f4-5ea3d8ea437e.JPG)
+![image_67109633](https://user-images.githubusercontent.com/101978292/220168648-2932c36c-0966-41e5-a975-c973e0792eb3.JPG)
 
 
 -I Used EventBridge to hookup Health Dashboard to SNS and send notification when there is a service health issue
