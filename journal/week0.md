@@ -228,12 +228,39 @@ Here is the diagram of the conceptual design
 
 I set Set MFA, IAM role
 - Go to authenication and create a multi authenication using authy. *Authy because i can use Authy on both mobile phones and desktop, i gave the user admin privellages by creating a user group and adding it.* 
+
+![MFA Setup](https://user-images.githubusercontent.com/101978292/220162733-365a6311-79f6-448d-a05f-da9bc08c68eb.jpg)
+
 - I created a cicd architectural diagram in Lucid Charts
 
 -![aws cicd](https://user-images.githubusercontent.com/101978292/219987635-a0b01bfe-de3e-44a6-aa69-276e7bd282d8.jpg)
 
 [Lucid Charts Share Link](https://lucid.app/lucidchart/6d1eee70-cdea-455a-bf4c-704b692ed691/edit?invitationId=inv_ccad551a-caec-4b9b-b629-819a3dd936bf
 )
+
+- I created the napkin drawing
+
+![image_67109633](https://user-images.githubusercontent.com/101978292/220162872-a9958ace-7e7f-4fbc-91f4-5ea3d8ea437e.JPG)
+
+
+-I Used EventBridge to hookup Health Dashboard to SNS and send notification when there is a service health issue
+First go sns and create a topic,
+
+![Sns health1](https://user-images.githubusercontent.com/101978292/220165623-94501796-b750-4eff-b73d-68f34089d9bb.jpg)
+
+
+
+then go the health dashbord, click on the event log, click on the event bridge and create and rule, using the sns topic name service health issue
+
+![health dashboard1](https://user-images.githubusercontent.com/101978292/220165859-b0e52c97-1012-401c-9830-1ab7039f9c84.jpg)
+
+![eventbridge health 3](https://user-images.githubusercontent.com/101978292/220165897-d5d568d4-b5b3-40d5-bdd3-a10c8e5f551b.jpg)
+
+Now go back to sns and verify your email and setup
+
+![Screenshot 2023-02-20 174333](https://user-images.githubusercontent.com/101978292/220166865-663b172a-c7c2-43fe-9d9d-cdeb7513f8a4.jpg)
+
+-
 
 
 
