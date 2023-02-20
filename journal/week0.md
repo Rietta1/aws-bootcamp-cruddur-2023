@@ -228,8 +228,11 @@ Here is the diagram of the conceptual design
 
 I set Set MFA, IAM role
 - Go to authenication and create a multi authenication using authy. *Authy because i can use Authy on both mobile phones and desktop, i gave the user admin privellages by creating a user group and adding it.* 
-- I created an architectural diagram in Lucid Charts
-[Lucid Charts Share Link](https://lucid.app/lucidchart/b873ffef-686d-4b5e-ba38-2c223d0ed424/edit?viewport_loc=495%2C228%2C1128%2C649%2C0_0&invitationId=inv_c60d0705-8e5e-4572-880c-28566427ceae
+- I created a cicd architectural diagram in Lucid Charts
+
+-![aws cicd](https://user-images.githubusercontent.com/101978292/219987635-a0b01bfe-de3e-44a6-aa69-276e7bd282d8.jpg)
+
+[Lucid Charts Share Link](https://lucid.app/lucidchart/6d1eee70-cdea-455a-bf4c-704b692ed691/edit?invitationId=inv_ccad551a-caec-4b9b-b629-819a3dd936bf
 )
 
 
