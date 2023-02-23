@@ -37,6 +37,7 @@ Remove this environment above because it was just a test
 *to clear out env var `export BACKEND_URL` and `unset FRONTEND_URL`, you can confirm by using `env | grep _URL`*
 <br></br>
 
+![1](https://user-images.githubusercontent.com/101978292/220800038-45a8e9fe-3586-4c91-aac6-97c17c1fede8.jpg)
 
 
 
@@ -63,6 +64,9 @@ CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=4567"]
 
 ```
 
+![2](https://user-images.githubusercontent.com/101978292/220800107-ae673054-c704-4130-86d9-0f2eb6677bdc.jpg)
+
+
 - Now go out from **backend-flask** dir and go into the project dir **aws-bootcamp-cruddur-2023**
 
 #### Build the backend-flask Image
@@ -78,6 +82,9 @@ docker build -t  backend-flaskimage ./backend-flask
 docker images
 
 ```
+
+![3](https://user-images.githubusercontent.com/101978292/220800212-938df056-f90a-4812-82c6-3708869d6f5d.jpg)
+
 
 ### Create the backend-flask Container 
 
@@ -186,6 +193,8 @@ docker build -t frontend-reactimage ./frontend-react-js
 docker run -p 3000:3000 -d frontend-reactimage
 ```
 
+![4](https://user-images.githubusercontent.com/101978292/220800505-cb884f37-464e-48f5-ae91-b9fec92feefa.jpg)
+
 ******
 
 
@@ -238,4 +247,5 @@ OR
 docker-compose up
 ```
 
+![6](https://user-images.githubusercontent.com/101978292/220800578-c2b9a7dc-fb74-44f1-ab4e-00b086f310e9.jpg)
 
