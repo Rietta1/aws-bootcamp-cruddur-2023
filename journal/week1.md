@@ -468,6 +468,11 @@ docker image rm -f $(docker image ls -aq)
 
 *the issue i faced was that the  ports werent showing the apps, so i connected the instance to the vscode and i foundout that the cantainers werent actually running, after days of troubleshooting i realised that the ec2 instance type was to small so i increased it from a t2micro to a t2.medium, all the ports started running, however the contains like the writeup werent showing, i am still trying to figure it out*
 
+![27](https://user-images.githubusercontent.com/101978292/222475524-88c11f5d-328b-4847-8c02-0a86e1b5336f.jpg)
+
+![25](https://user-images.githubusercontent.com/101978292/222475434-7a2bccfd-8be7-4844-95b9-ef4294e850e2.jpg)
+![26](https://user-images.githubusercontent.com/101978292/222475572-4dfacce2-4caa-4a5c-8c08-893a2da6a0c7.jpg)
+
 
 *When i relunched the instance after stoping it i received a message when trying to run npm i in the frontend folder that my server was full. so i debugged it by deleting the npm. at the home page and deleting the ovarlay at docker which caused issues*
 ```
@@ -493,7 +498,11 @@ sudo cd /var/lib/docker/overlay2
 
 5. i Ran the dockerfile CMD as an external script
 
-6. I Implemented a healthcheck in the V3 Docker compose file
+6. I Implemented a healthcheck in the V3 Docker compose file using synk
+
+
+![28](https://user-images.githubusercontent.com/101978292/222495626-b5125f10-bca9-46fb-9853-135f1ec29b9e.jpg)
+
 
 7. i installed Docker on my localmachine and get the same containers running outside of Gitpod / Codespaces
 
