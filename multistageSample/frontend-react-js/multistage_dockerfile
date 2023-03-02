@@ -1,0 +1,23 @@
+# build evn
+
+FROM node:16.18
+
+ENV PORT=3000
+
+COPY . /frontend-react-js
+WORKDIR /frontend-react-js
+RUN npm install
+EXPOSE ${PORT}
+CMD ["npm", "start"]
+
+#build a .war file
+FROM maven as maven
+RUN mkdir /frontend-react-js/mymavenbuild
+WORKDIR /frontend-react-js
+COPY . .
+RUN mvn install -DskipTests
+
+#Run this commands
+FROM tomcat:latest 
+COPY ./frontend-react-js.war /usr/local/tomcat/webapps
+RUN cp -r /usr/local/tomcat/webapps.dist/* /usr/local/tomcat/webapps
