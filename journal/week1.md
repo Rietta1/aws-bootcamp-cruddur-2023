@@ -333,8 +333,61 @@ and
 
 *copy homepagefeed.js which is similar and make changes* Change anywhere with the home to notifications
 
+### STEP 4 - Run DynamoDB Local Container and ensure it works
 
+add this too docker compose.yml file
 
+```
+ dynamodb-local:
+    # https://stackoverflow.com/questions/67533058/persist-local-dynamodb-data-in-volumes-lack-permission-unable-to-open-databa
+    # We needed to add user:root to get this working.
+    user: root
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
 
+```
+added postgres
+```
+  db:
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - '5432:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data
+
+```
+
+```
+volumes:
+  db:
+    driver: local
+```
 
 ##  Homework Challenge
+
+1. Launch an EC2 instance that has docker installed, and pull a container to demonstrate you can run your own docker processes. 
+
+2. Push and tag a image to DockerHub (they have a free tier)
+
+3. Research best practices of Dockerfiles and attempt to implement it in your Dockerfile
+
+4. Use multi-stage building for a Dockerfile build
+5. Run the dockerfile CMD as an external script
+
+6. Implement a healthcheck in the V3 Docker compose file
+
+7. Learn how to install Docker on your localmachine and get the same containers running outside of Gitpod / Codespaces
+
+
+
+
