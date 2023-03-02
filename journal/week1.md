@@ -38,8 +38,9 @@ Remove this environment above because it was just a test
 *to clear out env var `export BACKEND_URL` and `unset FRONTEND_URL`, you can confirm by using `env | grep _URL`*
 <br></br>
 
-![1](https://user-images.githubusercontent.com/101978292/220800038-45a8e9fe-3586-4c91-aac6-97c17c1fede8.jpg)
 
+
+![1](https://user-images.githubusercontent.com/101978292/222433945-741b06ea-9dc8-421f-bb70-f7ffd9a5808c.jpg)
 
 
 2. Add Dockerfile for backend
@@ -65,7 +66,8 @@ CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0", "--port=4567"]
 
 ```
 
-![2](https://user-images.githubusercontent.com/101978292/220800107-ae673054-c704-4130-86d9-0f2eb6677bdc.jpg)
+
+![2](https://user-images.githubusercontent.com/101978292/222433975-a4f98288-c73f-4e41-9af7-87b1fca62d43.jpg)
 
 
 - Now go out from **backend-flask** dir and go into the project dir **aws-bootcamp-cruddur-2023**
@@ -84,7 +86,8 @@ docker images
 
 ```
 
-![3](https://user-images.githubusercontent.com/101978292/220800212-938df056-f90a-4812-82c6-3708869d6f5d.jpg)
+
+![3](https://user-images.githubusercontent.com/101978292/222434005-eaba175b-3893-4768-8453-00f8981fbdea.jpg)
 
 
 4. Create the backend-flask Container 
@@ -189,7 +192,8 @@ docker container run --rm -p 3000:3000 -d frontend-reactimage
 
 
 
-![4](https://user-images.githubusercontent.com/101978292/220800505-cb884f37-464e-48f5-ae91-b9fec92feefa.jpg)
+
+![4](https://user-images.githubusercontent.com/101978292/222434105-394b2e71-baf3-4fa0-addc-54c4f1e771be.jpg)
 
 ******
 
@@ -243,7 +247,9 @@ OR
 docker-compose up
 ```
 
-![6](https://user-images.githubusercontent.com/101978292/220800578-c2b9a7dc-fb74-44f1-ab4e-00b086f310e9.jpg)
+![6](https://user-images.githubusercontent.com/101978292/222434190-13f5ddbd-4ee5-41a8-a59f-1c285837b8fd.jpg)
+
+![9](https://user-images.githubusercontent.com/101978292/222434621-110dd58a-96c1-4858-893d-bd02e3855621.jpg)
 
 
 ### STEP 4 - Create the notification feature (Backend and Front)
@@ -285,6 +291,9 @@ then go and turn on your docker compose `docker compose up`
                     $ref: '#/components/schemas/Activity'
 
 ```
+![10](https://user-images.githubusercontent.com/101978292/222435440-e6cd2751-f193-4c09-895d-b79b85722f10.jpg)
+
+
  2. Implement a Backend endpoint
 
  
@@ -298,18 +307,28 @@ def data_notifications():
   data = NotificationsActivities.run()
   return data, 200
  ```
+ 
+ ![11](https://user-images.githubusercontent.com/101978292/222435520-a87592a1-4753-4259-b98b-1d079b6a2d96.jpg)
+
 
 - Go to the top arrangements of api structure and add this line for organization
 
 ```py
 from services.notifications_activities import *
 ```
+![12](https://user-images.githubusercontent.com/101978292/222435595-460103e8-47b8-4106-97ce-cab16648d817.jpg)
+
 
 - Open the newly created folder named **notificataions_activites.py** and add this code
 
 *copy homeactivities.py which is similar and make changes* Change anywhere with the home to notifications
 
+![13](https://user-images.githubusercontent.com/101978292/222435700-b8e3efb9-2934-467a-a8b8-fa2a0633db8d.jpg)
+
+
 - open the link for 4567 in your browser and append to the url to `/api/activities/notifications`
+
+![14](https://user-images.githubusercontent.com/101978292/222435746-0d653cbd-4ca2-42f5-8684-aa9f6ce01b47.jpg)
 
 
  3. Implement a Frontend endpoint
@@ -329,9 +348,18 @@ and
     element: <NotificationsFeedPage />
   },
 ```
+
+![15](https://user-images.githubusercontent.com/101978292/222435906-15b2641a-b559-44e3-800d-37145c07f5c9.jpg)
+
+![16](https://user-images.githubusercontent.com/101978292/222435963-be68b648-5e1e-41e5-9b3b-0670c34abc64.jpg)
+
+
 - And the line of code for notifications and then go to **Pages** and create a folder and name it **NotificationsFeedPage.js**
 
 *copy homepagefeed.js which is similar and make changes* Change anywhere with the home to notifications
+
+![17](https://user-images.githubusercontent.com/101978292/222436082-2549adb3-986a-4aee-8dc9-3216ae60e686.jpg)
+
 
 ### STEP 4 - Run DynamoDB Local Container and ensure it works
 
@@ -352,6 +380,14 @@ add this too docker compose.yml file
     working_dir: /home/dynamodblocal
 
 ```
+
+![18](https://user-images.githubusercontent.com/101978292/222436151-9aace384-f4ee-4428-9bfa-92ddd12520cc.jpg)
+![20](https://user-images.githubusercontent.com/101978292/222436310-f38a94ca-899b-465d-ac1b-1dc78b19c984.jpg)
+
+![19](https://user-images.githubusercontent.com/101978292/222436209-c3dac3ae-77d3-4d2d-b68f-b4ad50caefac.jpg)
+
+![21](https://user-images.githubusercontent.com/101978292/222436359-94b4c5cb-67c5-49f6-b009-4d4b97e08e52.jpg)
+
 added postgres
 ```
   db:
@@ -372,6 +408,10 @@ volumes:
   db:
     driver: local
 ```
+
+![22](https://user-images.githubusercontent.com/101978292/222436414-c288274e-7154-4800-bdd3-375ec6f3cce8.jpg)
+![22](https://user-images.githubusercontent.com/101978292/222436602-de98310e-d405-4ce2-8f87-f5d04d3d0751.jpg)
+
 
 ##  Homework Challenge
 
