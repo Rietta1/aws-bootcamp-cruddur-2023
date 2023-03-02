@@ -375,18 +375,40 @@ volumes:
 
 ##  Homework Challenge
 
-1. Launch an EC2 instance that has docker installed, and pull a container to demonstrate you can run your own docker processes. 
+1. I Launched an EC2 instance that has docker installed, and pulled a container to demonstrate you can run your own docker processes. 
 
-2. Push and tag a image to DockerHub (they have a free tier)
+2. I Launched an EC2 instance that has docker installed, and pulled the crudder repo into the ec2 instance and ran the containers to demonstrate you can run your own docker processes. 
 
-3. Research best practices of Dockerfiles and attempt to implement it in your Dockerfile
+It issue i faced was that the the ports werent showing the apps, so i connected the instance to the vscode and i foundout that the cantainers werent actually running, after days of troubleshooting i realised that the ec2 instance type was to small so i increased it from a t2micro to a t2.medium, all the ports started running, however the contains like the writeup werent showing, i am still trying to figure it out
 
-4. Use multi-stage building for a Dockerfile build
+
+3. I Pushed and tagged the frontend,backend and dynamodb images to DockerHub 
+[Frontend](https://hub.docker.com/r/rietta/backend-flask)
+[Backend](https://hub.docker.com/r/rietta/backend-flask)
+[Dynamodb](https://hub.docker.com/r/rietta/dynamodb-local)
+
+4. I researched best practices of Dockerfiles and attempt to implement it in your Dockerfile
+ - i used official docker images as base image
+ - i used specific image versions
+ - optimized caching image layers
+ - used multi stage builds
+ - i used the least privileged user
+ - scanned images for vulnerabilities
+
 5. Run the dockerfile CMD as an external script
 
 6. Implement a healthcheck in the V3 Docker compose file
 
-7. Learn how to install Docker on your localmachine and get the same containers running outside of Gitpod / Codespaces
+7. i installed Docker on my localmachine and get the same containers running outside of Gitpod / Codespaces
+
+8. I tried using a multi-stage building for a Dockerfile build in the frontend, i created a new folder titled multistageSample.
+I havent fully understood the different ways it can be used
+
+
+
+
+
+
 
 
 
