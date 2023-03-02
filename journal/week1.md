@@ -417,17 +417,72 @@ volumes:
 
 1. I Launched an EC2 instance that has docker installed, and pulled a container to demonstrate you can run your own docker processes. 
 
-2. I Launched an EC2 instance that has docker installed, and pulled the crudder repo into the ec2 instance and ran the containers to demonstrate you can run your own docker processes. 
+2. I Launched an ubuntu EC2 instance, installed java.jdk
 
-It issue i faced was that the the ports werent showing the apps, so i connected the instance to the vscode and i foundout that the cantainers werent actually running, after days of troubleshooting i realised that the ec2 instance type was to small so i increased it from a t2micro to a t2.medium, all the ports started running, however the contains like the writeup werent showing, i am still trying to figure it out
+```
+sudo yum install java-1.8.0-openjdk-devel -y
 
+```
+
+installed docker 
+
+```
+sudo apt update
+
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+
+apt-cache policy docker-ce
+
+sudo apt install docker-ce
+
+sudo systemctl status docker
+
+```
+add docker to the wheel group
+
+```
+cat /etc/group
+
+sudo usermod -aG docker ec2-user
+
+groups ec2-user
+```
+then i installed docker-compose
+```
+sudo apt get docker compose
+```
+Then installed `npm install`
+then i pulled the crudder repo into the ec2 instance and, installed `npm i` in the frontend folder and then ran the containers `docker-compose up` to demonstrate you can run my own docker processes. 
+ 
+ to  remove sveral containers at once
+```
+docker container rm -f $(docker container ls -aq)
+
+docker image rm -f $(docker image ls -aq)
+
+```
+
+*the issue i faced was that the  ports werent showing the apps, so i connected the instance to the vscode and i foundout that the cantainers werent actually running, after days of troubleshooting i realised that the ec2 instance type was to small so i increased it from a t2micro to a t2.medium, all the ports started running, however the contains like the writeup werent showing, i am still trying to figure it out*
+
+
+*When i relunched the instance after stoping it i received a message when trying to run npm i in the frontend folder that my server was full. so i debugged it by deleting the npm. at the home page and deleting the ovarlay at docker which caused issues*
+```
+sudo cd /var/lib/docker/overlay2
+
+```
 
 3. I Pushed and tagged the frontend,backend and dynamodb images to DockerHub 
-[Frontend](https://hub.docker.com/r/rietta/backend-flask)
-[Backend](https://hub.docker.com/r/rietta/backend-flask)
-[Dynamodb](https://hub.docker.com/r/rietta/dynamodb-local)
+- [Frontend](https://hub.docker.com/r/rietta/backend-flask)
+- [Backend](https://hub.docker.com/r/rietta/backend-flask)
+- [Dynamodb](https://hub.docker.com/r/rietta/dynamodb-local)
+
 
 4. I researched best practices of Dockerfiles and attempt to implement it in your Dockerfile
+
  - i used official docker images as base image
  - i used specific image versions
  - optimized caching image layers
@@ -435,9 +490,10 @@ It issue i faced was that the the ports werent showing the apps, so i connected 
  - i used the least privileged user
  - scanned images for vulnerabilities
 
-5. Run the dockerfile CMD as an external script
 
-6. Implement a healthcheck in the V3 Docker compose file
+5. i Ran the dockerfile CMD as an external script
+
+6. I Implemented a healthcheck in the V3 Docker compose file
 
 7. i installed Docker on my localmachine and get the same containers running outside of Gitpod / Codespaces
 
