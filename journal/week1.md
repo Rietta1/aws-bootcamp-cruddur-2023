@@ -496,15 +496,15 @@ sudo cd /var/lib/docker/overlay2
  - scanned images for vulnerabilities
 
 
-5. i Ran the dockerfile CMD as an external script
-
-6. I Implemented a healthcheck in the V3 Docker compose file using synk
+5. I Implemented a healthcheck in the V3 Docker compose file using synk
 
 
 ![28](https://user-images.githubusercontent.com/101978292/222495626-b5125f10-bca9-46fb-9853-135f1ec29b9e.jpg)
 
 
-7. i installed Docker on my localmachine and get the same containers running outside of Gitpod / Codespaces
+6. i installed Docker on my localmachine and get the same containers running outside of Gitpod / Codespaces
+
+7. i Ran the dockerfile CMD as an external script
 
 8. I tried using a multi-stage building for a Dockerfile build in the frontend, i created a new folder titled multistageSample.
 I havent fully understood the different ways it can be used
