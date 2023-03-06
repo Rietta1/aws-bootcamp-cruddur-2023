@@ -2,15 +2,29 @@
 
 ## Technical Tasks - Observability
 
+
+
+### Video Review
+* Watched [FREE AWS Cloud Project Bootcamp - Update 2023-02-23 Video](https://youtu.be/gQxzMvk6BzM).
+* Watched [Week 2 - Live Streamed Video – Honeycomb.io Setup](https://www.youtube.com/live/2GD9xCzRId4?feature=share).
+* Watched [Week 2 - Instrument X-Ray Video](https://youtu.be/n2DTsuBrD_A).
+* Watched [Week 2 – X-Ray Subsegments Solved Video](https://youtu.be/4SGTW0Db5y0)
+* Watched [Week 2 - CloudWatch Logs Video](https://youtu.be/ipdFizZjOF4).
+* Watched [Week 2 - Rollbar Video](https://youtu.be/xMBDAb5SEU4).
+* Watched [Week 2 – Github Codespaces Crash Course Video](https://youtu.be/L9KKBXgKopA).
+
+
+
+
 ### STEP 1 -  implement distributed tracing with Honeycomb.io
 
 
 Honeycomb's auto-instrumentation allows you to send basic data quickly using the OpenTelemetry industry standard, before adding custom context.
 
-Login into your [HONEYCOMB](https://www.honeycomb.io/), create an environemnt and call it crudder, then copy the api key and install it into your gitpod workspace (cd aws-bootcamp-cruddur-2023) , the code format below:
+Login into your [HONEYCOMB](https://www.honeycomb.io/), create an environemnt and call it crudder, then copy the api key and install it into your **gitpod workspace** (cd aws-bootcamp-cruddur-2023) , the code format below:
 
 ```
-export HONEYCOMB_API_KEY="BWMg6QIoezI5tUiGh7hnfA"
+exportHONEYCOMB_API_KEY="SBWMg6QIoezI5tUiGh7hnfA"
 export HONEYCOMB_SERVICE_NAME="Cruddur"
 gp env HONEYCOMB_API_KEY="SBWMg6QIoezI5tUiGh7hnfA"
 gp env HONEYCOMB_SERVICE_NAME="Cruddur"
@@ -25,6 +39,13 @@ unset HONEYCOMB_SERVICE_NAME
 
 ![1](https://user-images.githubusercontent.com/101978292/222611341-d8c6a890-af6c-4716-9bb3-fc07a5fc1eaa.jpg)
 
+**To set environmenal var for codespaces** 
+
+create a folder named .env and add
+
+```
+HONEYCOMB_API_KEY="BWMg6QIoezI5tUiGh7hnfA
+```
 
 configuring otel(OpenTelemetry) part of the cnnf (cloud native computing foundation) that also runs kubernates{really well governed communites} to send to honeycomb
 your cloud envrionments sends standarzied info to honeycomb, which honey comb gives you a UI to look at them, u can also send to other backends like kubernates
