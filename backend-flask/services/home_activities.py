@@ -5,8 +5,8 @@ import logging
 tracer = trace.get_tracer("home.activites")
 
 class HomeActivities:
-  def run(LOGGER):
-    LOGGER.info('HomeActivities')
+  def run():
+    #LOGGER.info('HomeActivities')
     with tracer.start_as_current_span("home-activities-mock-data"):
       span = trace.get_current_span()
       now = datetime.now(timezone.utc).astimezone()
