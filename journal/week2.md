@@ -214,7 +214,7 @@ aws xray create-group \
 {
     "Group": {
         "GroupName": "Cruddur",
-        "GroupARN": "arn:aws:xray:us-east-1:319506457158:group/Cruddur/QPVDGFMO7MZ3MF5UTXCICTP7MHLA775AS5WDKENJ7RO4APDAU72Q",
+        "GroupARN": "arn:aws:xray:us-east-1:"":group/Cruddur/",
         "FilterExpression": "service(\"backend-flask\")",
         "InsightsConfiguration": {
             "InsightsEnabled": false,
