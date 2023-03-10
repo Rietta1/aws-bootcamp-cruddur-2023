@@ -436,8 +436,9 @@ I fixed one, which had to do with honeycomb(you have to create a .env directory 
 The x-ray configuration for the backend won't run, I strongly believe it has to do with the codespaces configuration( AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"), I tried to fix it to codespaces own but I couldn't.
 
 ## Homework Challenges 
+(Still working on them)
 - Instrument Honeycomb for the frontend-application to observe network latency between frontend and backend[HARD]
 - Add custom instrumentation to Honeycomb to add more attributes eg. UserId, Add a custom span
 - Run custom queries in Honeycomb and save them later eg. Latency by UserID, Recent Traces
 - Configure additional  contentual information like when error and metrics it happened, who it happened for with Rollbar
-- Implement xray for the frontend
+- Implement xray for the frontend.
