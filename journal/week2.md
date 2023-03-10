@@ -278,7 +278,7 @@ Add xray Deamon Service to Docker Compose file
 ```
 from aws_xray_sdk.core import xray_recorder
 
-
+add this in user_activities.py
 # xray ---
   segment = xray_recorder.begin_segment('home_activities')
 
@@ -316,7 +316,10 @@ We need to set our access token in the terminal
 export ROLLBAR_ACCESS_TOKEN=""
 gp env ROLLBAR_ACCESS_TOKEN=""
 ```
-
+Add this to the dockercompose file
+```
+ROLLBAR_ACCESS_TOKEN: "${ROLLBAR_ACCESS_TOKEN}"
+```
 import Rollbar to the app.py file
 
 ```
@@ -354,6 +357,15 @@ def rollbar_test():
     rollbar.report_message('Hello World!', 'warning')
     return "Hello World!"
 ```
+
+### Attended Rollbar Project Configuration Best Practices Webinar
+
+* [Video Recording](https://youtu.be/if79J5qJyo8)
+* The webcast covered a number of useful best practices for setting up Rollbar.
+
+
+## Publications
+
 
 
 ### STEP 4 -  implement distributed tracing with Cloudwatch
@@ -422,3 +434,10 @@ Set the env var in your backend-flask for `docker-compose.yml`
 Problems faced
 I fixed one, which had to do with honeycomb(you have to create a .env directory and add the HONEYCOMB_API_KEY= to it for metrics to be sent to honeycomb.) 
 The x-ray configuration for the backend won't run, I strongly believe it has to do with the codespaces configuration( AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"), I tried to fix it to codespaces own but I couldn't.
+
+## Homework Challenges 
+- Instrument Honeycomb for the frontend-application to observe network latency between frontend and backend[HARD]
+- Add custom instrumentation to Honeycomb to add more attributes eg. UserId, Add a custom span
+- Run custom queries in Honeycomb and save them later eg. Latency by UserID, Recent Traces
+- Configure additional  contentual information like when error and metrics it happened, who it happened for with Rollbar
+- Implement xray for the frontend
