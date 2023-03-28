@@ -214,7 +214,7 @@ aws xray create-group \
 {
     "Group": {
         "GroupName": "Cruddur",
-        "GroupARN": "arn:aws:xray:us-east-1:319506457158:group/Cruddur/QPVDGFMO7MZ3MF5UTXCICTP7MHLA775AS5WDKENJ7RO4APDAU72Q",
+        "GroupARN": "arn:aws:xray:us-east-1:"":group/Cruddur/",
         "FilterExpression": "service(\"backend-flask\")",
         "InsightsConfiguration": {
             "InsightsEnabled": false,
@@ -223,6 +223,12 @@ aws xray create-group \
     }
 }
  ```
+ 
+ ![12](https://user-images.githubusercontent.com/101978292/224344801-fd148bae-56e5-44c4-9d04-d2fb3fa2e75c.jpg)
+
+![14](https://user-images.githubusercontent.com/101978292/224345579-5ac9c930-8b43-41b1-bd21-2d6574befbef.jpg)
+
+ 
 Go to aws console and find xray
 input this in the cli
 
@@ -292,6 +298,8 @@ add this in user_activities.py
   subsegment.put_metadata('key', dict, 'namespace')   
 ```
 
+![15](https://user-images.githubusercontent.com/101978292/224345795-a7241d0c-6f66-4514-8ab7-16f89a082119.jpg)
+
 
 ### STEP 3 -  implement distributed tracing with ROLLBAR
 
@@ -358,13 +366,13 @@ def rollbar_test():
     return "Hello World!"
 ```
 
+![17](https://user-images.githubusercontent.com/101978292/224346297-8a1ed360-5dc0-474c-81a6-ba97cbcca659.jpg)
+
+
 ### Attended Rollbar Project Configuration Best Practices Webinar
 
 * [Video Recording](https://youtu.be/if79J5qJyo8)
 * The webcast covered a number of useful best practices for setting up Rollbar.
-
-
-## Publications
 
 
 
@@ -429,6 +437,7 @@ Set the env var in your backend-flask for `docker-compose.yml`
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
 ```
 
+![16cloudwatch](https://user-images.githubusercontent.com/101978292/224345936-37c58c71-b4b8-4afe-9c86-4f98bf7e3eb1.jpg)
 
 
 Problems faced
