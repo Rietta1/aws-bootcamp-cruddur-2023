@@ -2,11 +2,24 @@
 
 ## Technical Tasks -
 
+
 Decentralized authentication is an approach to user authentication that relies on decentralized systems, rather than a centralized authority, to authenticate user identities. In a decentralized authentication system, users are authenticated through the use of digital signatures and cryptographic keys, rather than through a central authentication server.
 
 AWS Cognito is a fully managed identity service offered by Amazon Web Services (AWS). It provides user sign-up, sign-in, and access control capabilities to web and mobile applications.
 
-### STEP 1 -  Provision via ClickOps a Amazon Cognito User Pool
+
+### Video Review
+
+* Watched: [Week 3 - Live Streamed Video – Decentralized Authentication](https://www.youtube.com/live/9obl7rVgzJw)
+* Watched: [Week 3 - Cognito Custom Pages](https://youtu.be/T4X4yIzejTc)
+* Watched: [Week 3 - Cognito – JWT Server Side Verify](https://youtu.be/d079jccoG-M)
+* Watched: [Week 3 - Exploring JWTs](https://youtu.be/nJjbI4BbasU)
+* Watched: [Week 3 - Improving UI Contrast and Implementing CSS Variables for Theming](https://youtu.be/m9V4SmJWoJU)
+* Watched: [Week 3 - Security Considerations - Decentralized Authentication](https://youtu.be/tEJIeII66pY)
+
+
+
+### STEP 1 - FRONTEND AUTHENTICATION, Provision via ClickOps a Amazon Cognito User Pool
 
 - Go to aws and cognito, 
 - dont click on federated identity providers,
@@ -362,3 +375,194 @@ cors = CORS(
   methods="OPTIONS,GET,HEAD,POST"
 )
 ```
+
+### JWT 
+
+### Authenticating Server Side [BACKEND AUTHENTICATION]
+
+Add in the frontend-react-js , `HomeFeedPage.js` a header eto pass along the access token
+
+```js
+//add it to line 27 to 29. above method:"GET"
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("access_token")}`
+  }
+```
+Create s folder in `backend-flask` named `lib` and create a file named `cognito_jwt_token` add this code:
+
+```py
+import time
+import requests
+from jose import jwk, jwt
+from jose.exceptions import JOSEError
+from jose.utils import base64url_decode
+
+class FlaskAWSCognitoError(Exception):
+  pass
+
+class TokenVerifyError(Exception):
+  pass
+
+def extract_access_token(request_headers):
+    access_token = None
+    auth_header = request_headers.get("Authorization")
+    if auth_header and " " in auth_header:
+        _, access_token = auth_header.split()
+    return access_token
+
+class CognitoJwtToken:
+    def __init__(self, user_pool_id, user_pool_client_id, region, request_client=None):
+        self.region = region
+        if not self.region:
+            raise FlaskAWSCognitoError("No AWS region provided")
+        self.user_pool_id = user_pool_id
+        self.user_pool_client_id = user_pool_client_id
+        self.claims = None
+        if not request_client:
+            self.request_client = requests.get
+        else:
+            self.request_client = request_client
+        self._load_jwk_keys()
+
+
+    def _load_jwk_keys(self):
+        keys_url = f"https://cognito-idp.{self.region}.amazonaws.com/{self.user_pool_id}/.well-known/jwks.json"
+        try:
+            response = self.request_client(keys_url)
+            self.jwk_keys = response.json()["keys"]
+        except requests.exceptions.RequestException as e:
+            raise FlaskAWSCognitoError(str(e)) from e
+
+    @staticmethod
+    def _extract_headers(token):
+        try:
+            headers = jwt.get_unverified_headers(token)
+            return headers
+        except JOSEError as e:
+            raise TokenVerifyError(str(e)) from e
+
+    def _find_pkey(self, headers):
+        kid = headers["kid"]
+        # search for the kid in the downloaded public keys
+        key_index = -1
+        for i in range(len(self.jwk_keys)):
+            if kid == self.jwk_keys[i]["kid"]:
+                key_index = i
+                break
+        if key_index == -1:
+            raise TokenVerifyError("Public key not found in jwks.json")
+        return self.jwk_keys[key_index]
+
+    @staticmethod
+    def _verify_signature(token, pkey_data):
+        try:
+            # construct the public key
+            public_key = jwk.construct(pkey_data)
+        except JOSEError as e:
+            raise TokenVerifyError(str(e)) from e
+        # get the last two sections of the token,
+        # message and signature (encoded in base64)
+        message, encoded_signature = str(token).rsplit(".", 1)
+        # decode the signature
+        decoded_signature = base64url_decode(encoded_signature.encode("utf-8"))
+        # verify the signature
+        if not public_key.verify(message.encode("utf8"), decoded_signature):
+            raise TokenVerifyError("Signature verification failed")
+
+    @staticmethod
+    def _extract_claims(token):
+        try:
+            claims = jwt.get_unverified_claims(token)
+            return claims
+        except JOSEError as e:
+            raise TokenVerifyError(str(e)) from e
+
+    @staticmethod
+    def _check_expiration(claims, current_time):
+        if not current_time:
+            current_time = time.time()
+        if current_time > claims["exp"]:
+            raise TokenVerifyError("Token is expired")  # probably another exception
+
+    def _check_audience(self, claims):
+        # and the Audience  (use claims['client_id'] if verifying an access token)
+        audience = claims["aud"] if "aud" in claims else claims["client_id"]
+        if audience != self.user_pool_client_id:
+            raise TokenVerifyError("Token was not issued for this audience")
+
+    def verify(self, token, current_time=None):
+        """ https://github.com/awslabs/aws-support-tools/blob/master/Cognito/decode-verify-jwt/decode-verify-jwt.py """
+        if not token:
+            raise TokenVerifyError("No token provided")
+
+        headers = self._extract_headers(token)
+        pkey_data = self._find_pkey(headers)
+        self._verify_signature(token, pkey_data)
+
+        claims = self._extract_claims(token)
+        self._check_expiration(claims, current_time)
+        self._check_audience(claims)
+
+        self.claims = claims 
+        return claims
+
+```
+
+Add this `Flask-AWSCognito` to your `requirements.txt` file in backend-flask folder
+
+Go to the backend-flask `cd backend-flask` and run this command `pip install -r requirements.txt` to install a libary, compose up
+
+Add this for authentication to app.py
+
+```py
+
+#paste on line 17 under import
+from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token, TokenVerifyError
+
+
+
+#paste on line 72 to 76 under app = Flask(__name__)
+cognito_jwt_token = CognitoJwtToken(
+  user_pool_id=os.getenv("AWS_COGNITO_USER_POOL_ID"), 
+  user_pool_client_id=os.getenv("AWS_COGNITO_USER_POOL_CLIENT_ID"),
+  region=os.getenv("AWS_DEFAULT_REGION")
+)
+```
+
+```py
+#replace cors on line 90 t0 96 under origins = [frontend, backend]
+cors = CORS(
+  app, 
+  resources={r"/api/*": {"origins": origins}},
+  headers=['Content-Type', 'Authorization'], 
+  expose_headers='Authorization',
+  methods="OPTIONS,GET,HEAD,POST"
+)
+```
+Go to class `HomeActivities.py` and add 
+  `def run(cognito_user_id=None)` to line8, under `class HomeActivities:`
+
+  ```py
+  #paste on line 55 to 65 above span.set, this is to test the configuration
+      if cognito_user_id != None:
+        extra_crud = {
+          'uuid': '248959df-3079-4947-b847-9e0892d1bab4',
+          'handle':  'Lore',
+          'message': 'My dear brother, it the humans that are the problem',
+          'created_at': (now - timedelta(hours=1)).isoformat(),
+          'expires_at': (now + timedelta(hours=12)).isoformat(),
+          'likes': 1042,
+          'replies': []
+        }
+        results.insert(0,extra_crud)
+  ```
+
+  ## Stretch Homework
+
+  (Still working on them)
+
+ - Decouple the JWT verify from the application code by writing a  Flask Middleware
+- Decouple the JWT verify by implementing a Container Sidecar pattern using AWS’s official Aws-jwt-verify.js library
+- Decouple the JWT verify process by using Envoy as a sidecar https://www.envoyproxy.io/
+- Implement a IdP login eg. Login with Amazon or Facebook or Apple.
+- Implement MFA that send an SMS (text message), warning this has spend, investigate spend before considering, text messages are not eligible for AWS Credits
