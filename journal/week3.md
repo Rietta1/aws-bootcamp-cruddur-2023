@@ -77,7 +77,7 @@ Amplify.configure({
 });
 
 ```
-Add this variables to your dockerfile
+Add this variables to your dockercompose file
 
 ```yml
 //add this to dockercompode under honeycomb
@@ -94,8 +94,10 @@ REACT_APP_AWS_USER_POOLS_ID: "us-east-1_9SSnqJfAp"
 REACT_APP_CLIENT_ID: "54egusrg833i2no7gg5ooknnkk"
 
 ```
-*commit code* add  image 1 and 2
 
+![1](https://user-images.githubusercontent.com/101978292/228810007-b60f6a44-8526-4afd-9fdd-3d6cc72752e4.jpg)
+
+![2](https://user-images.githubusercontent.com/101978292/228810024-e6517024-03c4-4e82-a7ea-eea0c92517d6.jpg)
 
 
 ### Conditionally show components based on logged in or logged out status
@@ -213,6 +215,7 @@ const [cognitoErrors, setCognitoErrors] = React.useState('');
 // //just before submit component
 // {errors}
 ```
+![signin page](https://user-images.githubusercontent.com/101978292/228810464-777d8d84-a404-4773-8b0e-cc0e7da19f59.jpg)
 
 Go over to cognito user pool created(crudder-user-pool) and create a user
 -name: loretta
@@ -556,12 +559,13 @@ Go to class `HomeActivities.py` and add
         }
         results.insert(0,extra_crud)
   ```
+![jwt](https://user-images.githubusercontent.com/101978292/228810294-c1a79078-ac7d-4fa8-9207-ebb12a1d7148.jpg)
 
   ## Stretch Homework
 
   (Still working on them)
 
- - Decouple the JWT verify from the application code by writing a  Flask Middleware
+- Decouple the JWT verify from the application code by writing a  Flask Middleware
 - Decouple the JWT verify by implementing a Container Sidecar pattern using AWS’s official Aws-jwt-verify.js library
 - Decouple the JWT verify process by using Envoy as a sidecar https://www.envoyproxy.io/
 - Implement a IdP login eg. Login with Amazon or Facebook or Apple.
