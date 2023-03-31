@@ -1,4 +1,4 @@
-CREATE EXTE-- Schema is used to define the structure of your db
+CREATE EXTENSION "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 DROP TABLE IF EXISTS public.users;
 DROP TABLE IF EXISTS public.activities;
