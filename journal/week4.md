@@ -103,19 +103,19 @@ Run this command on the terminal
 
 ```sql
 -- run this command, if it connects automatically that means it works
-psql postgresql://postgres:password@localhost:5432/crudder
+psql postgresql://postgres:password@localhost:5432/cruddur
 
 -- set it as an env variable with this
-export CONNECTION_URL="postgresql://postgres:password@localhost:5432/crudder"
+export CONNECTION_URL="postgresql://postgres:password@localhost:5432/cruddur"
 
 -- set for gitpod workspace
-gp env CONNECTION_URL="postgresql://postgres:password@localhost:5432/crudder"
+gp env CONNECTION_URL="postgresql://postgres:password@localhost:5432/cruddur"
 
 -- set for your aws postgres db created for production(you will find the endpoint in aws console, RDS/Databases/cruddur-db-instance)
-export CONNECTION_URL="postgresql://crudderroot:password1@cruddur-db-instance.cyckofd4eywp.us-east-1.rds.amazonaws.com:5432/crudder"
+export PROD_CONNECTION_URL="postgresql://cruddurroot:password1@cruddur-db-instance.cyckofd4eywp.us-east-1.rds.amazonaws.com:5432/cruddur"
 
 -- set for gitpod workspace 
-gp env CONNECTION_URL="postgresql://crudderroot:password1@cruddur-db-instance.cyckofd4eywp.us-east-1.rds.amazonaws.com:5432/crudder"
+gp env PROD_CONNECTION_URL="postgresql://cruddurroot:password1@cruddur-db-instance.cyckofd4eywp.us-east-1.rds.amazonaws.com:5432/cruddur"
 ```
 Then you can run the command directly to connect to your postgres
  
@@ -158,9 +158,45 @@ CREATE TABLE public.activities (
 
 -- psql cruddur < db/schema.sql -h localhost -U postgres
 ```
+### 2ndImport Script
+Create a folder `db` in `backend-flask`
+We'll create a new SQL file called `seed.sql`
+and we'll place it in `backend-flask/db` and paste this in the file created
+```sql
+-- this file was manually created
+INSERT INTO public.users (display_name, handle, cognito_user_id)
+VALUES
+  ('Andrew Brown', 'andrewbrown' ,'MOCK'),
+  ('Andrew Bayko', 'bayko' ,'MOCK');
+
+INSERT INTO public.activities (user_uuid, message, expires_at)
+VALUES
+  (
+    (SELECT uuid from public.users WHERE users.handle = 'andrewbrown' LIMIT 1),
+    'This was imported as seed data!',
+    current_timestamp + interval '10 day'
+  )
+```
 
 
-- Create a Directory called `bin` and create 5 more dir inside it named `db-create`, `db-drop`, `db-schema-load`, `db-connect`,`db-setup`.
+
+- Create a Directory called `bin` and create 5 more dir inside it named `db-create`, `db-drop`, `db-schema-load`, `db-connect`,`db-setup`,`db-seed` ,`db-sessions`.
+
+
+- Add this bashscripts to `db-connect`
+
+```sh
+#this script is to connect to the db server
+#! /usr/bin/bash
+if [ "$1" = "prod" ]; then
+  echo "Running in production mode"
+  URL=$PROD_CONNECTION_URL
+else
+  URL=$CONNECTION_URL
+fi
+
+# psql $URL
+```
 
 - Add these bashscripts to `db-create` this is used to create databases
 
@@ -190,7 +226,7 @@ NO_DB_CONNECTION_URL=$(sed 's/\/cruddur//g' <<<"$CONNECTION_URL")
 psql $NO_DB_CONNECTION_URL -c "drop database cruddur;"
 ```
 
-- Add this bashscripts to `db-schema-load`
+- Add this bashscripts  `db-schema-load` to run `schema.sql`
 
 ```sh
 #! /usr/bin/bash
@@ -214,11 +250,19 @@ fi
 
 ```
 
-- Add this bashscripts to `db-connect`
+- Add this bashscripts to `db-seed`
 
 ```sh
-#this script is to connect to the db server
 #! /usr/bin/bash
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="db-seed"
+printf "${CYAN}== ${LABEL}${NO_COLOR}\n"
+
+seed_path="$(realpath .)/db/seed.sql"
+echo $seed_path
+
 if [ "$1" = "prod" ]; then
   echo "Running in production mode"
   URL=$PROD_CONNECTION_URL
@@ -226,8 +270,9 @@ else
   URL=$CONNECTION_URL
 fi
 
-# psql $URL
+psql $URL cruddur < $seed_path
 ```
+
 
 - Add this bashscripts to `db-setup`
 
@@ -248,6 +293,9 @@ source "$bin_path/db-schema-load"
 source "$bin_path/db-seed"
 ```
 
+- Add this bashscripts to `db-session`
+
+
 Now in other to execute any of these files you need to give the files executable permission. Run these commands;
 
 ```sh
@@ -255,13 +303,21 @@ Now in other to execute any of these files you need to give the files executable
 chmod u+x bin/db-create 
 
 # this sets for all 3 different levels permission 
+chmod +x db/schema.sql
+
+chmod +x db/seed.sql
+
+chmod +x bin/db-connect
+
 chmod +x bin/db-drop
 
 chmod +x bin/db-schema-load
 
-chmod +x bin/db-connect
+chmod +x bin/db-seed
 
 chmod u+x bin/db-setup
+
+chmod +x bin/db-sessions
 
 # you could also use chmod 644 bin/db-create
 
@@ -271,10 +327,12 @@ ls -la
 Now to execute the files run `./<folder>/<file>` or `source <folder>/<file>`
 
 ```sh
- ./bin/db-drop or source bin/db-drop
+ ./bin/db-setup or source bin/db-setup
 ```
 
+
 ### Install Postgres Engine for python
+We need to install Postgres Engine so that we can run the database setup just created
 
 - We'll add the following to our requirments.txt
 
@@ -290,88 +348,258 @@ pip install -r requirements.txt
 ```py
 from psycopg_pool import ConnectionPool
 import os
-import re
-import sys
-from flask import current_app as app
+
+def query_wrap_object(template):
+  sql = f"""
+  (SELECT COALESCE(row_to_json(object_row),'{{}}'::json) FROM (
+  {template}
+  ) object_row);
+  """
+  return sql
+
+def query_wrap_array(template):
+  sql = f"""
+  (SELECT COALESCE(array_to_json(array_agg(row_to_json(array_row))),'[]'::json) FROM (
+  {template}
+  ) array_row);
+  """
+  return sql
+
+connection_url = os.getenv("CONNECTION_URL")
+pool = ConnectionPool(connection_url)
+```
+
+- Create a connection by adding this to `dockercompose` file
+
+```yml
+     CONNECTION_URL: "${PROD_CONNECTION_URL}"
+      #CONNECTION_URL: "postgresql://postgres:password@db:5432/cruddur"
+```
+
+- Go to `home_activities.py`
+
+```py
+# add this to line 4 under from opentelemetry import trace
+from lib.db import pool, query_wrap_array
+```
+```py
+class HomeActivities:
+  def run(cognito_user_id=None):
+    #logger.info("HomeActivities")
+    #with tracer.start_as_current_span("home-activites-mock-data"):
+    #  span = trace.get_current_span()
+    #  now = datetime.now(timezone.utc).astimezone()
+    #  span.set_attribute("app.now", now.isoformat())
+        sql = query_wrap_array("""
+      SELECT
+        activities.uuid,
+        users.display_name,
+        users.handle,
+        activities.message,
+        activities.replies_count,
+        activities.reposts_count,
+        activities.likes_count,
+        activities.reply_to_activity_uuid,
+        activities.expires_at,
+        activities.created_at
+      FROM public.activities
+      LEFT JOIN public.users ON users.uuid = activities.user_uuid
+      ORDER BY activities.created_at DESC
+    """)
+    print("SQL--------------")
+    print(sql)
+    print("SQL--------------")
+    with pool.connection() as conn:
+      with conn.cursor() as cur:
+        cur.execute(sql)
+        # this will return a tuple
+        # the first field being the data
+        json = cur.fetchone()
+    print("-1----")
+    print(json[0])
+    return json[0]
+    return results
+```
+#####################
+### Connect to RDS via Gitpod
+In order to connect to the RDS instance we need to provide our Gitpod IP and whitelist for inbound traffic on port 5432.
+
+
+Run this command in the terminal
+```sh
+GITPOD_IP=$(curl ifconfig.me)
+#copy the ip and use it in your security group in aws 
+echo $GITPOD_IP
+```
+
+We'll create an inbound rule for Postgres (5432) and provide the GITPOD ID.
+
+We'll get the security group rule id so we can easily modify it in the future from the terminal here in Gitpod.
+
+> run this in your terminal and add it to codespaces settings
+```sh
+export DB_SG_ID="sg-0107b3fc7d7977da0"
+gp env DB_SG_ID="sg-0107b3fc7d7977da0"
+export DB_SG_RULE_ID="sgr-092c6e84ccf5ee75f"
+gp env DB_SG_RULE_ID="sgr-092c6e84ccf5ee75f"
+export GITPOD_IP=$(curl ifconfig.me)
+```
+Whenever we need to update our security groups we can do this for access. This will set your SG dynamically
+
+execute this command in the terminal
+```sh
+aws ec2 modify-security-group-rules \
+    --group-id $DB_SG_ID \
+    --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$GITPOD_IP/32}"
+```
+To ensure that this loads whenever your workspace opens, create a file in `bin` and name it `rds-update-sg-rule` add the command to it.
+
+```sh
+#! /usr/bin/bash
+
+CYAN='\033[1;36m'
+NO_COLOR='\033[0m'
+LABEL="rds-update-sg-rule"
+printf "${CYAN}==== ${LABEL}${NO_COLOR}\n"
+
+aws ec2 modify-security-group-rules \
+    --group-id $DB_SG_ID \
+    --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={Description=GITPOD,IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$GITPOD_IP/32}"
+```
+Then run this to grant executable permission to the file
+`chmod u+x bin/rds-update-sg-rule`
+
+Now run `./bin/rds-update-sg-rule`
+
+- Add this to gitpod.yml
+```yml
+#At line 17 to 19 under sudo apt install -y postgresql-client-13 libpq-dev
+    command: |
+      export GITPOD_IP=$(curl ifconfig.me)
+      source "$THEIA_WORKSPACE_ROOT/backend-flask/bin/rds-update-sg-rule"
+```
+
+
+
+
+### For Post confirmation Lamda
+
+Create a folder in aws and call it lamdas, now create a file names `cruddur-post-confirmation.py` then add this code 
+```py
+import json
+import psycopg2
+import os
+
+def lambda_handler(event, context):
+    user = event['request']['userAttributes']
+    print('userAttributes')
+    print(user)
+
+    user_display_name  = user['name']
+    user_email         = user['email']
+    user_handle        = user['preferred_username']
+    user_cognito_id    = user['sub']
+    try:
+      print('entered-try')
+      sql = f"""
+         INSERT INTO public.users (
+          display_name, 
+          email,
+          handle, 
+          cognito_user_id
+          ) 
+        VALUES(
+          '{user_display_name}', 
+          '{user_email}', 
+          '{user_handle}', 
+          '{user_cognito_id}'
+        )
+      """
+      print('SQL Statement ----')
+      print(sql)
+      conn = psycopg2.connect(os.getenv('CONNECTION_URL'))
+      cur = conn.cursor()
+      cur.execute(sql)
+      conn.commit() 
+
+    except (Exception, psycopg2.DatabaseError) as error:
+      print(error)
+    finally:
+      if conn is not None:
+          cur.close()
+          conn.close()
+          print('Database connection closed.')
+    return event
+```
+
+Change this in schema.sql file
+
+```sql
+CREATE TABLE public.users (
+  uuid UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  display_name text NOT NULL,
+  handle text NOT NULL,
+  email text NOT NULL,
+  cognito_user_id text NOT NULL,
+  created_at TIMESTAMP default current_timestamp NOT NULL
+);
+```
+
+Make this changes to docker-compose.yml file
+``` yml    
+ CONNECTION_URL: "${PROD_CONNECTION_URL}"
+#CONNECTION_URL: "postgresql://postgres:password@db:5432/cruddur"
+
+```
+> **Run `./bin/db-setup` to setup the schema structure on postgres**
+
+
+### refactor the db library
+
+change the db.py file to this
+
+```py
+from psycopg_pool import ConnectionPool
+import os
 
 class Db:
   def __init__(self):
     self.init_pool()
 
-  def template(self,*args):
-    pathing = list((app.root_path,'db','sql',) + args)
-    pathing[-1] = pathing[-1] + ".sql"
-
-    template_path = os.path.join(*pathing)
-
-    green = '\033[92m'
-    no_color = '\033[0m'
-    print("\n")
-    print(f'{green} Load SQL Template: {template_path} {no_color}')
-
-    with open(template_path, 'r') as f:
-      template_content = f.read()
-    return template_content
-
   def init_pool(self):
     connection_url = os.getenv("CONNECTION_URL")
     self.pool = ConnectionPool(connection_url)
   # we want to commit data such as an insert
-  # be sure to check for RETURNING in all uppercases
-  def print_params(self,params):
-    blue = '\033[94m'
-    no_color = '\033[0m'
-    print(f'{blue} SQL Params:{no_color}')
-    for key, value in params.items():
-      print(key, ":", value)
-
-  def print_sql(self,title,sql):
-    cyan = '\033[96m'
-    no_color = '\033[0m'
-    print(f'{cyan} SQL STATEMENT-[{title}]------{no_color}')
-    print(sql)
-  def query_commit(self,sql,params={}):
-    self.print_sql('commit with returning',sql)
-
-    pattern = r"\bRETURNING\b"
-    is_returning_id = re.search(pattern, sql)
-
+  def query_commit(self):
     try:
-      with self.pool.connection() as conn:
-        cur =  conn.cursor()
-        cur.execute(sql,params)
-        if is_returning_id:
-          returning_id = cur.fetchone()[0]
-        conn.commit() 
-        if is_returning_id:
-          return returning_id
+      conn = self.pool.connection()
+      cur =  conn.cursor()
+      cur.execute(sql)
+      conn.commit() 
     except Exception as err:
       self.print_sql_err(err)
+      #conn.rollback()
   # when we want to return a json object
-  def query_array_json(self,sql,params={}):
-    self.print_sql('array',sql)
-
+  def query_array_json(self,sql):
+    print("SQL STATEMENT-[array]------")
+    print(sql + "\n")
     wrapped_sql = self.query_wrap_array(sql)
     with self.pool.connection() as conn:
       with conn.cursor() as cur:
-        cur.execute(wrapped_sql,params)
+        cur.execute(wrapped_sql)
         json = cur.fetchone()
         return json[0]
   # When we want to return an array of json objects
-  def query_object_json(self,sql,params={}):
-
-    self.print_sql('json',sql)
-    self.print_params(params)
+  def query_object_json(self,sql):
+    print("SQL STATEMENT-[object]-----")
+    print(sql + "\n")
     wrapped_sql = self.query_wrap_object(sql)
-
     with self.pool.connection() as conn:
       with conn.cursor() as cur:
-        cur.execute(wrapped_sql,params)
+        cur.execute(wrapped_sql)
         json = cur.fetchone()
-        if json == None:
-          "{}"
-        else:
-          return json[0]
+        return json[0]
+
   def query_wrap_object(self,template):
     sql = f"""
     (SELECT COALESCE(row_to_json(object_row),'{{}}'::json) FROM (
@@ -397,6 +625,9 @@ class Db:
     print ("\npsycopg ERROR:", err, "on line number:", line_num)
     print ("psycopg traceback:", traceback, "-- type:", err_type)
 
+    # psycopg2 extensions.Diagnostics object attribute
+    print ("\nextensions.Diagnostics:", err.diag)
+
     # print the pgcode and pgerror exceptions
     print ("pgerror:", err.pgerror)
     print ("pgcode:", err.pgcode, "\n")
@@ -404,16 +635,58 @@ class Db:
 db = Db()
 ```
 
-- Create a connection by adding this to `dockercompose` file
-
-```yml
-     CONNECTION_URL: "${PROD_CONNECTION_URL}"
-      #CONNECTION_URL: "postgresql://postgres:password@db:5432/cruddur"
-```
-
-- Go to `home_activities.py`
+In home activities.py
 
 ```py
-# add this to line 4 under from opentelemetry import trace
+#line for replace the inital from lib.db import pool, query_wrap_array
 from lib.db import db
+
+
+
+#at line 36 put self.create_activity() under else
+    else:
+      self.create_activity()
+      model['data'] = {
+        'uuid': uuid.uuid4(),
+        'display_name': 'Andrew Brown',
+
+
+
+#past this in line 52-69
+        'created_at': now.isoformat(),
+        'expires_at': (now + ttl_offset).isoformat()
+      }
+    return model
+  def create_activity(user_uuid, message, expires_at):
+    sql = f"""
+    INSERT INTO (
+      user_uuid,
+      message,
+      expires_at
+    )
+    VALUES (
+      "{user_uuid}",
+      "{message}",
+      "{expires_at}"
+    )
+    """
+    #query_commit(sql)
+
+#replace this at line 12-18
+    #  span = trace.get_current_span()
+    #  now = datetime.now(timezone.utc).astimezone()
+    #  span.set_attribute("app.now", now.isoformat())
+    results = db.query_array_json("""
+      SELECT
+        activities.uuid,
+        users.display_name,
+
+
+#Replace this 28-31
+      LEFT JOIN public.users ON users.uuid = activities.user_uuid
+      ORDER BY activities.created_at DESC
+    """)
+    return results
+
 ```
+
