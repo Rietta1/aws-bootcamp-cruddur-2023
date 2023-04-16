@@ -328,6 +328,9 @@ Now to execute the files run `./<folder>/<file>` or `source <folder>/<file>`
 
 ```sh
  ./bin/db-setup or source bin/db-setup
+
+#  to connect to Prodution database put prod at the end
+../bin/db-setup prod
 ```
 
 
@@ -484,7 +487,13 @@ Now run `./bin/rds-update-sg-rule`
 
 ### For Post confirmation Lamda
 
-Create a folder in aws and call it lamdas, now create a file names `cruddur-post-confirmation.py` then add this code 
+- Create a folder in aws and call it lamdas, now create a file names `cruddur-post-confirmation.py` then add this code.
+Go to the aws console, create a lambda function
+- click on Author from scratch
+- funtion name = cruddur-post-confirmation
+- Runtime = Python3.8
+- x86.64, then create 
+- click on code then paste this command in the `lambda_function `under the Test and then Deploy
 ```py
 import json
 import psycopg2
@@ -532,6 +541,72 @@ def lambda_handler(event, context):
     return event
 ```
 
+Go to `configuration` in Environmental variables, Click on add key 
+*go to your work env. paste this, `env | grep PROD`, copy the result and in value section in your aws console and create
+*Key = CONNECTION_URL
+*Value = postgresql://cruddurroot:password1@cruddur-db-instance.cyckofd4eywp.us-east-1.rds.amazonaws.com:5432/cruddur
+
+Here is a link to [ARN](https://github.com/jetbridge/psycopg2-lambda-layer), pick one in your region , navigate to `code` then layers, add layers, click on specify an ARN and paste the ARN in the option it provides, verify and add."lambda:GetLayerVersion" action on the specified resource.
+
+There is a copy ARN and the consle, copy it, `arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py38:2
+`, you will get an error
+
+To resolve this issue, you can grant the necessary permissions to the IAM user by following these steps:
+
+> Log in to the AWS Management Console with an account that has the necessary permissions to modify IAM policies.
+Navigate to the IAM console and select the user "admin" from the list of users.
+
+- Click on the "Permissions" tab and scroll down to the "Inline Policies" section.
+
+- Click on the "Create Policy" button and select "Create Your Own Policy".
+
+- Give your policy a name and enter the following JSON policy document:
+
+json
+Copy code
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "lambda:GetLayerVersion",
+            "Resource": "arn:aws:lambda:us-east-1:898466741470:layer:psycop2-py38:2"
+        }
+    ]
+}
+- Click "Create Policy" to create the policy.
+Once the policy has been created, the "admin" IAM user should now have the necessary permissions to perform "lambda:GetLayerVersion" action on the specified resource.
+
+- Go to cognito, Amazon Cognito>User pools>crudder-user-pool>Add Lambda trigger
+*sign up>Post confirmation trigger> cruddur-post-confirmation.*
+
+- Delete previous user you created in coginto so you can  create another one.
+
+- Go back to your frontend and signup
+*you will get this error `PostConfirmation failed with error 2023-04-14T13:43:49.576Z a95e8e3a-946a-4495-a5b3-93430c320f48 Task timed out after 3.01 seconds.`*
+
+- Go to IAM in the console and create a policy and name it `AWSLambdaVPCAccessExecustionRole` and then attach it to your lambda function `cruddur-post-confirmation-role`
+
+Add this policy 
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:CreateNetworkInterface",
+                "ec2:DeleteNetworkInterface",
+                "ec2:DescribeInstances",
+                "ec2:AttachNetworkInterface"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
 Change this in schema.sql file
 
 ```sql
@@ -554,7 +629,8 @@ Make this changes to docker-compose.yml file
 > **Run `./bin/db-setup` to setup the schema structure on postgres**
 
 
-### refactor the db library
+
+### Refactor the db library
 
 change the db.py file to this
 
@@ -635,7 +711,7 @@ class Db:
 db = Db()
 ```
 
-In home activities.py
+In services create_activity.py
 
 ```py
 #line for replace the inital from lib.db import pool, query_wrap_array
@@ -671,6 +747,13 @@ from lib.db import db
     )
     """
     #query_commit(sql)
+```
+
+In home home_activity.py
+
+```py
+#line 4 replace the inital from lib.db import pool, query_wrap_array
+from lib.db import db
 
 #replace this at line 12-18
     #  span = trace.get_current_span()
@@ -690,3 +773,308 @@ from lib.db import db
 
 ```
 
+### Implement create activity
+
+
+In backend post-confirrmation.py `aws/lambdas/cruddur-post-confirrmation.py`
+
+```py
+#replace this at line 20-23
+   handle, 
+  cognito_user_id
+  ) 
+VALUES(%s,%s,%s,%s)
+
+#replace this at line 29-35
+      params = [
+        user_display_name,
+        user_email,
+        user_handle,
+        user_cognito_id
+      ]
+      cur.execute(sql,*params)
+```
+
+Create a new folder in activities named create.sql `backend-flask/db/sql/activities/create.sql`
+
+Paste this
+
+```
+INSERT INTO public.activities (
+  user_uuid,
+  message,
+  expires_at
+)
+VALUES (
+  (SELECT uuid 
+    FROM public.users 
+    WHERE users.handle = %(handle)s
+    LIMIT 1
+  ),
+  %(message)s,
+  %(expires_at)s
+) RETURNING uuid;wq 
+```
+
+Create two new folders in db namely sql and activities in sql and create a file named home.sql `backend-flask/db/sql/activities/home.sql`
+
+```
+SELECT
+  activities.uuid,
+  users.display_name,
+  users.handle,
+  activities.message,
+  activities.replies_count,
+  activities.reposts_count,
+  activities.likes_count,
+  activities.reply_to_activity_uuid,
+  activities.expires_at,
+  activities.created_at
+FROM public.activities
+LEFT JOIN public.users ON users.uuid = activities.user_uuid
+ORDER BY activities.created_at DESC
+```
+
+Create a new folder in activities named object.sql `backend-flask/db/sql/activities/object.sql`
+
+```
+SELECT
+  activities.uuid,
+  users.display_name,
+  users.handle,
+  activities.message,
+  activities.created_at,
+  activities.expires_at
+FROM public.activities
+INNER JOIN public.users ON users.uuid = activities.user_uuid 
+WHERE 
+  activities.uuid = %(uuid)s
+```
+
+Create a new folder in lib named db.py `backend-flask/lib/db.py`
+
+```py
+from psycopg_pool import ConnectionPool
+import os
+import re
+import sys
+from flask import current_app as app
+
+class Db:
+  def __init__(self):
+    self.init_pool()
+
+  def template(self,*args):
+    pathing = list((app.root_path,'db','sql',) + args)
+    pathing[-1] = pathing[-1] + ".sql"
+
+    template_path = os.path.join(*pathing)
+
+    green = '\033[92m'
+    no_color = '\033[0m'
+    print("\n")
+    print(f'{green} Load SQL Template: {template_path} {no_color}')
+
+    with open(template_path, 'r') as f:
+      template_content = f.read()
+    return template_content
+
+  def init_pool(self):
+    connection_url = os.getenv("CONNECTION_URL")
+    self.pool = ConnectionPool(connection_url)
+  # we want to commit data such as an insert
+  # be sure to check for RETURNING in all uppercases
+  def print_params(self,params):
+    blue = '\033[94m'
+    no_color = '\033[0m'
+    print(f'{blue} SQL Params:{no_color}')
+    for key, value in params.items():
+      print(key, ":", value)
+
+  def print_sql(self,title,sql):
+    cyan = '\033[96m'
+    no_color = '\033[0m'
+    print(f'{cyan} SQL STATEMENT-[{title}]------{no_color}')
+    print(sql)
+  def query_commit(self,sql,params={}):
+    self.print_sql('commit with returning',sql)
+
+    pattern = r"\bRETURNING\b"
+    is_returning_id = re.search(pattern, sql)
+
+    try:
+      with self.pool.connection() as conn:
+        cur =  conn.cursor()
+        cur.execute(sql,params)
+        if is_returning_id:
+          returning_id = cur.fetchone()[0]
+        conn.commit() 
+        if is_returning_id:
+          return returning_id
+    except Exception as err:
+      self.print_sql_err(err)
+  # when we want to return a json object
+  def query_array_json(self,sql,params={}):
+    self.print_sql('array',sql)
+
+    wrapped_sql = self.query_wrap_array(sql)
+    with self.pool.connection() as conn:
+      with conn.cursor() as cur:
+        cur.execute(wrapped_sql,params)
+        json = cur.fetchone()
+        return json[0]
+  # When we want to return an array of json objects
+  def query_object_json(self,sql,params={}):
+
+    self.print_sql('json',sql)
+    self.print_params(params)
+    wrapped_sql = self.query_wrap_object(sql)
+
+    with self.pool.connection() as conn:
+      with conn.cursor() as cur:
+        cur.execute(wrapped_sql,params)
+        json = cur.fetchone()
+        if json == None:
+          "{}"
+        else:
+          return json[0]
+  def query_wrap_object(self,template):
+    sql = f"""
+    (SELECT COALESCE(row_to_json(object_row),'{{}}'::json) FROM (
+    {template}
+    ) object_row);
+    """
+    return sql
+  def query_wrap_array(self,template):
+    sql = f"""
+    (SELECT COALESCE(array_to_json(array_agg(row_to_json(array_row))),'[]'::json) FROM (
+    {template}
+    ) array_row);
+    """
+    return sql
+  def print_sql_err(self,err):
+    # get details about the exception
+    err_type, err_obj, traceback = sys.exc_info()
+
+    # get the line number when exception occured
+    line_num = traceback.tb_lineno
+
+    # print the connect() error
+    print ("\npsycopg ERROR:", err, "on line number:", line_num)
+    print ("psycopg traceback:", traceback, "-- type:", err_type)
+
+    # print the pgcode and pgerror exceptions
+    print ("pgerror:", err.pgerror)
+    print ("pgcode:", err.pgcode, "\n")
+
+db = Db()
+```
+
+Edit create_activity `backend-flask/services/create_activity.py`
+
+```py
+from datetime import datetime, timedelta, timezone
+
+from lib.db import db
+
+class CreateActivity:
+  def run(message, user_handle, ttl):
+    model = {
+      'errors': None,
+      'data': None
+    }
+
+    now = datetime.now(timezone.utc).astimezone()
+
+    if (ttl == '30-days'):
+      ttl_offset = timedelta(days=30) 
+    elif (ttl == '7-days'):
+      ttl_offset = timedelta(days=7) 
+    elif (ttl == '3-days'):
+      ttl_offset = timedelta(days=3) 
+    elif (ttl == '1-day'):
+      ttl_offset = timedelta(days=1) 
+    elif (ttl == '12-hours'):
+      ttl_offset = timedelta(hours=12) 
+    elif (ttl == '3-hours'):
+      ttl_offset = timedelta(hours=3) 
+    elif (ttl == '1-hour'):
+      ttl_offset = timedelta(hours=1) 
+    else:
+      model['errors'] = ['ttl_blank']
+
+    if user_handle == None or len(user_handle) < 1:
+      model['errors'] = ['user_handle_blank']
+
+    if message == None or len(message) < 1:
+      model['errors'] = ['message_blank'] 
+    elif len(message) > 280:
+      model['errors'] = ['message_exceed_max_chars'] 
+
+    if model['errors']:
+      model['data'] = {
+        'handle':  user_handle,
+        'message': message
+      }   
+    else:
+      expires_at = (now + ttl_offset)
+      uuid = CreateActivity.create_activity(user_handle,message,expires_at)
+
+      object_json = CreateActivity.query_object_activity(uuid)
+      model['data'] = object_json
+    return model
+
+  def create_activity(handle, message, expires_at):
+    sql = db.template('activities','create')
+    uuid = db.query_commit(sql,{
+      'handle': handle,
+      'message': message,
+      'expires_at': expires_at
+    })
+    return uuid
+  def query_object_activity(uuid):
+    sql = db.template('activities','object')
+    return db.query_object_json(sql,{
+      'uuid': uuid
+    })
+
+```
+Edit home_activities.py `backend-flask/services/home_activities.py`
+
+```py
+from datetime import datetime, timedelta, timezone
+from opentelemetry import trace
+
+from lib.db import db
+
+#tracer = trace.get_tracer("home.activities")
+
+class HomeActivities:
+  def run(cognito_user_id=None):
+    #logger.info("HomeActivities")
+    #with tracer.start_as_current_span("home-activites-mock-data"):
+    #  span = trace.get_current_span()
+    #  now = datetime.now(timezone.utc).astimezone()
+    #  span.set_attribute("app.now", now.isoformat())
+    sql = db.template('activities','home')
+    results = db.query_array_json(sql)
+    return results
+```
+
+- Edit `backend-flask/app.py` , scroll down to `CreateActivity` and change the user_handle from 'andrewbrown' to your username 'rietta'
+
+```py
+@app.route("/api/activities", methods=['POST','OPTIONS'])
+@cross_origin()
+def data_activities():
+  user_handle  = 'rietta'
+  message = request.json['message']
+  ttl = request.json['ttl']
+  model = CreateActivity.run(message, user_handle, ttl)
+  if model['errors'] is not None:
+    return model['errors'], 422
+  else:
+    return model['data'], 200
+  return
+
+```
