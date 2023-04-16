@@ -1078,3 +1078,13 @@ def data_activities():
   return
 
 ```
+
+## ERRORS FACED
+1. I kept getting this error with creating a user: PostConfirmation failed with error 2023-04-14T13:24:11.567Z a3767796-0875-4969-a1ee-2c9ca791ba94 Task timed out after 3.01 seconds.
+Turned out it is as a result of my security group not been to set to allow postgres 0.0.0.0
+
+2. Getting this error in the backend logs when trying to post activity create activity failure NotNullViolation .
+fixed it by 
+: Editing the `backend-flask/app.py` , scroll down to `CreateActivity` and change the user_handle from 'andrewbrown' to your username 'rietta'
+
+3. Remember to install postgres sudo apt install postgres, if the psql command isnt working
