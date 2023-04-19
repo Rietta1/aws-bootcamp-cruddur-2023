@@ -1,64 +1,83 @@
 from datetime import datetime, timedelta, timezone
 
 from lib.db import db
+from lib.ddb import Ddb
 
-class CreateActivity:
-  def run(message, user_handle, ttl):
+class CreateMessage:
+  # mode indicates if we want to create a new message_group or using an existing one
+  def run(mode, message, cognito_user_id, message_group_uuid=None, user_receiver_handle=None):
     model = {
       'errors': None,
       'data': None
     }
 
-    now = datetime.now(timezone.utc).astimezone()
+    if (mode == "update"):
+      if message_group_uuid == None or len(message_group_uuid) < 1:
+        model['errors'] = ['message_group_uuid_blank']
 
-    if (ttl == '30-days'):
-      ttl_offset = timedelta(days=30) 
-    elif (ttl == '7-days'):
-      ttl_offset = timedelta(days=7) 
-    elif (ttl == '3-days'):
-      ttl_offset = timedelta(days=3) 
-    elif (ttl == '1-day'):
-      ttl_offset = timedelta(days=1) 
-    elif (ttl == '12-hours'):
-      ttl_offset = timedelta(hours=12) 
-    elif (ttl == '3-hours'):
-      ttl_offset = timedelta(hours=3) 
-    elif (ttl == '1-hour'):
-      ttl_offset = timedelta(hours=1) 
-    else:
-      model['errors'] = ['ttl_blank']
 
-    if user_handle == None or len(user_handle) < 1:
-      model['errors'] = ['user_handle_blank']
+    if cognito_user_id == None or len(cognito_user_id) < 1:
+      model['errors'] = ['cognito_user_id_blank']
+
+    if (mode == "create"):
+      if user_receiver_handle == None or len(user_receiver_handle) < 1:
+        model['errors'] = ['user_reciever_handle_blank']
 
     if message == None or len(message) < 1:
       model['errors'] = ['message_blank'] 
-    elif len(message) > 280:
+    elif len(message) > 1024:
       model['errors'] = ['message_exceed_max_chars'] 
 
     if model['errors']:
+      # return what we provided
       model['data'] = {
-        'handle':  user_handle,
+        'display_name': 'Andrew Brown',
+        'handle':  user_sender_handle,
         'message': message
-      }   
+      }
     else:
-      expires_at = (now + ttl_offset)
-      uuid = CreateActivity.create_activity(user_handle,message,expires_at)
+      sql = db.template('users','create_message_users')
 
-      object_json = CreateActivity.query_object_activity(uuid)
-      model['data'] = object_json
+      if user_receiver_handle == None:
+        rev_handle = ''
+      else:
+        rev_handle = user_receiver_handle
+      users = db.query_array_json(sql,{
+        'cognito_user_id': cognito_user_id,
+        'user_receiver_handle': rev_handle
+      })
+      print("USERS =-=-=-=-==")
+      print(users)
+
+      my_user    = next((item for item in users if item["kind"] == 'sender'), None)
+      other_user = next((item for item in users if item["kind"] == 'recv')  , None)
+
+      print("USERS=[my-user]==")
+      print(my_user)
+      print("USERS=[other-user]==")
+      print(other_user)
+
+      ddb = Ddb.client()
+
+      if (mode == "update"):
+        data = Ddb.create_message(
+          client=ddb,
+          message_group_uuid=message_group_uuid,
+          message=message,
+          my_user_uuid=my_user['uuid'],
+          my_user_display_name=my_user['display_name'],
+          my_user_handle=my_user['handle']
+        )
+      elif (mode == "create"):
+        data = Ddb.create_message_group(
+          client=ddb,
+          message=message,
+          my_user_uuid=my_user['uuid'],
+          my_user_display_name=my_user['display_name'],
+          my_user_handle=my_user['handle'],
+          other_user_uuid=other_user['uuid'],
+          other_user_display_name=other_user['display_name'],
+          other_user_handle=other_user['handle']
+        )
+      model['data'] = data
     return model
-
-  def create_activity(handle, message, expires_at):
-    sql = db.template('activities','create')
-    uuid = db.query_commit(sql,{
-      'handle': handle,
-      'message': message,
-      'expires_at': expires_at
-    })
-    return uuid
-  def query_object_activity(uuid):
-    sql = db.template('activities','object')
-    return db.query_object_json(sql,{
-      'uuid': uuid
-    })

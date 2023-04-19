@@ -41,7 +41,7 @@ class Db:
     print(f'{cyan} SQL STATEMENT-[{title}]------{no_color}')
     print(sql,params)
   def query_commit(self,sql,params={}):
-    self.print_sql('commit with returning',sql)
+    self.print_sql('commit with returning',sql,params)
 
     pattern = r"\bRETURNING\b"
     is_returning_id = re.search(pattern, sql)
@@ -92,6 +92,13 @@ class Db:
   def query_wrap_object(self,template):
     sql = f"""
     (SELECT COALESCE(row_to_json(object_row),'{{}}'::json) FROM (
+    {template}
+    ) object_row);
+    """
+    return sql
+  def query_wrap_array(self,template):
+    sql = f"""
+    (SELECT COALESCE(array_to_json(array_agg(row_to_json(array_row))),'[]'::json) FROM (
     {template}
     ) array_row);
     """
