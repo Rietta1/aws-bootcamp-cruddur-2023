@@ -1,4 +1,3 @@
-
 import './MessageGroupPage.css';
 import React from "react";
 import { useParams } from 'react-router-dom';
