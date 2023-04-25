@@ -2,6 +2,10 @@
 
 ## Technical Tasks 
 
+### Challanges faced 
+1) Log group does not exist
+The specific log group: /aws/lambda/cruddur-messaging-stream does not exist in this account or region. (I CANT SEEM TO SOLVE THIS ONE, I have edited and added the polices and searched for solutions online, cant fix it)
+2) the name of the user wasn't showing and the messages (Fixed it by changing the emails of the users in /bin/db/seed.sql to my own and then creating an account.
 ### Provision RDS Instance
 
 ### Install BOTO3 
