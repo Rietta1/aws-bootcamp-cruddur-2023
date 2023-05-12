@@ -40,13 +40,14 @@
           }
         },
         "environment": [
-          {"name": "OTEL_SERVICE_NAME", "value": "backend-flask"},
+          {"name": "OTEL_SERVICE_NAME", "value": "https://api.rietta.online"},
           {"name": "OTEL_EXPORTER_OTLP_ENDPOINT", "value": "https://api.honeycomb.io"},
           {"name": "AWS_COGNITO_USER_POOL_ID", "value": "us-east-1_YMdvcghdH"},
           {"name": "AWS_COGNITO_USER_POOL_CLIENT_ID", "value": "25jlejh9os80sll6an57quh8ab"},
-          {"name": "FRONTEND_URL", "value": "*"},
-          {"name": "BACKEND_URL", "value": "*"},
-          {"name": "AWS_DEFAULT_REGION", "value": "us-east-1"}
+          {"name": "FRONTEND_URL", "value": "https://rietta.online"},
+          {"name": "BACKEND_URL", "value": "https://api.rietta.online"},
+          {"name": 
+          "AWS_DEFAULT_REGION", "value": "us-east-1"}
         ],
         "secrets": [
           {"name": "AWS_ACCESS_KEY_ID"    , "valueFrom": "arn:aws:ssm:us-east-1:319506457158:parameter/cruddur/backend-flask/AWS_ACCESS_KEY_ID"},
