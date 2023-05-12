@@ -1,11 +1,16 @@
 #! /usr/bin/bash
 
+ABS_PATH=$(readlink -f "$0")
+BIN_PATH=$(dirname $ABS_PATH)
+PROJECT_PATH=$(dirname $BIN_PATH)
+FRONTEND_REACT_JS_PATH="$PROJECT_PATH/frontend-react-js"
+
 docker build \
---build-arg REACT_APP_BACKEND_URL="https://api.rietta.online" \
+--build-arg REACT_APP_BACKEND_URL="https://api.rietta.online/" \
 --build-arg REACT_APP_AWS_PROJECT_REGION="$AWS_DEFAULT_REGION" \
 --build-arg REACT_APP_AWS_COGNITO_REGION="$AWS_DEFAULT_REGION" \
 --build-arg REACT_APP_AWS_USER_POOLS_ID="us-east-1_YMdvcghdH" \
 --build-arg REACT_APP_CLIENT_ID="25jlejh9os80sll6an57quh8ab" \
 -t frontend-react-js \
--f Dockerfile.prod \
-.
+-f "$FRONTEND_REACT_JS_PATH/Dockerfile.prod" \
+"$FRONTEND_REACT_JS_PATH/."

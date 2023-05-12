@@ -1,5 +1,5 @@
 #! /usr/bin/bash
- # stop if it fails at any point
+ set -e # stop if it fails at any point
 
 #echo "==== db-setup"
 CYAN='\033[1;36m'
@@ -7,7 +7,8 @@ NO_COLOR='\033[0m'
 LABEL="setup"
 printf "${CYAN}==== ${LABEL}${NO_COLOR}\n"
 
-bin_path="$(realpath .)/bin/db"
+ABS_PATH=$(readlink -f "$0")
+bin_path=$(dirname $ABS_PATH)
 
 source "$bin_path/drop"
 source "$bin_path/create"
