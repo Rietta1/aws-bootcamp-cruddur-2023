@@ -17,8 +17,8 @@
 			],
 			"settings": {
 				"workbench.colorTheme": "Default Dark+ Experimental",
-				"terminal.integrated.fontSize": 20,
-				"editor.fontSize": 20
+				"terminal.integrated.fontSize": 14,
+				"editor.fontSize": 14
 			}
 		}
 	},
