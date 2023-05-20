@@ -2,7 +2,7 @@ version: "3.8"
 services:
   backend-flask:
     env_file:
-      - backend-flask.env
+      - erb/backend-flask-codespaces.env.erb
     build: ./backend-flask
     ports:
       - "4567:4567"
@@ -12,7 +12,7 @@ services:
     - cruddur-net
   frontend-react-js:
     env_file:
-      - frontend-react-js.env
+      - erb/frontend-react-js-codespaces.env.erb
     build: ./frontend-react-js
     ports:
       - "3000:3000"
