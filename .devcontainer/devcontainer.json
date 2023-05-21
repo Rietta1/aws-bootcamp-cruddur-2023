@@ -7,24 +7,21 @@
 	},
 	"remoteEnv": {
 		"AWS_CLI_AUTO_PROMPT": "on-partial"
-	},	
+	},
 	"customizations": {
 		"vscode": {
 			"extensions": [
 				"ms-azuretools.vscode-docker",
 				"ms-python.python",
-				"vscodevim.vim"
+				"42Crunch.vscode-openapi"
 			],
 			"settings": {
+				"workbench.colorTheme": "Default Dark+ Experimental",
 				"terminal.integrated.fontSize": 14,
-				"editor.fontSize": 14,
-				"workbench.colorTheme": "Default Dark+ Experimental"
+				"editor.fontSize": 14
 			}
 		}
-		
-
-
-	}
+	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
@@ -33,4 +30,6 @@
 
 	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "devcontainer"
+	"postCreateCommand": "bash .devcontainer/postCreateCommand.sh"
+
 }
