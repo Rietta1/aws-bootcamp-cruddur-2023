@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2023-06-09T16:05:06.664Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36" etag="sqwCvbmGRe1QvnMPIFXW" version="21.3.8" type="github">
+<mxfile host="app.diagrams.net" modified="2023-06-09T16:12:22.893Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36" etag="rVEog7UlA8CTvcRVnM9w" version="21.3.8" type="github">
   <diagram name="Network-Layer" id="vktZMe8x5p6Vtm1BOrrI">
-    <mxGraphModel dx="2899" dy="1848" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2204" dy="1795" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -24,6 +24,12 @@
         </mxCell>
         <mxCell id="iuy7iuIk75hRO5tpLLpg-60" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;&lt;b style=&quot;&quot;&gt;Cruddur Stack&lt;/b&gt;&lt;/font&gt;" style="text;strokeColor=none;align=left;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="iuy7iuIk75hRO5tpLLpg-64">
           <mxGeometry x="35" y="4.875" width="87.5" height="29.25" as="geometry" />
+        </mxCell>
+        <mxCell id="iuy7iuIk75hRO5tpLLpg-70" value="" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="iuy7iuIk75hRO5tpLLpg-64">
+          <mxGeometry x="160" y="150" width="220" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="iuy7iuIk75hRO5tpLLpg-79" value="Networking/ Outputs exports" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="iuy7iuIk75hRO5tpLLpg-64">
+          <mxGeometry x="160" y="150" width="100" height="30" as="geometry" />
         </mxCell>
         <mxCell id="PxYdW4Z8PxXyfOMz7trt-4" value="&lt;b&gt;&lt;font color=&quot;#000000&quot;&gt;CruddurVPC&lt;/font&gt;&lt;/b&gt;" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;container=1;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc;strokeColor=#248814;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#AAB7B8;dashed=0;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="330" y="20" width="500" height="490" as="geometry" />
@@ -198,7 +204,7 @@
         <mxCell id="iuy7iuIk75hRO5tpLLpg-32" value="Cluster" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="50" y="230" width="100" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="iuy7iuIk75hRO5tpLLpg-43" value="" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;elbow=vertical;startArrow=classic;startFill=1;endArrow=classic;endFill=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="iuy7iuIk75hRO5tpLLpg-33" target="iuy7iuIk75hRO5tpLLpg-37">
+        <mxCell id="iuy7iuIk75hRO5tpLLpg-43" value="" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;elbow=vertical;startArrow=none;startFill=0;endArrow=classic;endFill=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="iuy7iuIk75hRO5tpLLpg-33" target="iuy7iuIk75hRO5tpLLpg-37">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="iuy7iuIk75hRO5tpLLpg-33" value="" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#B0084D;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.template;" vertex="1" parent="1">
@@ -207,7 +213,7 @@
         <mxCell id="iuy7iuIk75hRO5tpLLpg-34" value="Networking" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="-300" y="230" width="100" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="iuy7iuIk75hRO5tpLLpg-41" value="" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;elbow=vertical;startArrow=classic;startFill=1;" edge="1" parent="1" source="iuy7iuIk75hRO5tpLLpg-37" target="iuy7iuIk75hRO5tpLLpg-31">
+        <mxCell id="iuy7iuIk75hRO5tpLLpg-41" value="" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;elbow=vertical;startArrow=none;startFill=0;" edge="1" parent="1" source="iuy7iuIk75hRO5tpLLpg-37" target="iuy7iuIk75hRO5tpLLpg-31">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="iuy7iuIk75hRO5tpLLpg-37" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
