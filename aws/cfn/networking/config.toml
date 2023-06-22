@@ -1,4 +1,4 @@
 [deploy]
 bucket = 'cfn-artifactscruddur'
 region = 'us-east-1'
-stack_name = 'CrdCluster'
+stack_name = 'CrdNet'
