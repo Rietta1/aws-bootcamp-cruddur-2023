@@ -380,6 +380,7 @@ add this too docker compose.yml file
     working_dir: /home/dynamodblocal
 
 ```
+Example of using DynamoDB local https://github.com/100DaysOfCloud/challenge-dynamodb-local
 
 ![18](https://user-images.githubusercontent.com/101978292/222436151-9aace384-f4ee-4428-9bfa-92ddd12520cc.jpg)
 ![20](https://user-images.githubusercontent.com/101978292/222436310-f38a94ca-899b-465d-ac1b-1dc78b19c984.jpg)
