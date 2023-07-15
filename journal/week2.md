@@ -321,8 +321,8 @@ pip install -r requirements.txt
 We need to set our access token in the terminal
 
 ```
-export ROLLBAR_ACCESS_TOKEN=""
-gp env ROLLBAR_ACCESS_TOKEN=""
+export ROLLBAR_ACCESS_TOKEN="917c9f1ceefb47c3b385a1b51ac1c8cf"
+gp env ROLLBAR_ACCESS_TOKEN="917c9f1ceefb47c3b385a1b51ac1c8cf"
 ```
 Add this to the dockercompose file
 ```
